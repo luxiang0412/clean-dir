@@ -1,7 +1,14 @@
+use std::path::Path;
+
 use colored::Colorize;
 
 use crate::detector::ProjectArtifact;
 use crate::scanner::DetectedDir;
+
+fn display_path(path: &Path) -> String {
+    let s = path.display().to_string();
+    s.strip_prefix(r"\\?\").unwrap_or(&s).to_string()
+}
 
 pub fn format_size(bytes: u64) -> String {
     const KB: u64 = 1024;
@@ -36,12 +43,12 @@ pub fn print_results(results: &[DetectedDir]) {
 
     let max_path_len = results
         .iter()
-        .map(|d| d.path.display().to_string().len())
+        .map(|d| display_path(&d.path).len())
         .max()
         .unwrap_or(0);
 
     for d in results {
-        let path_str = d.path.display().to_string();
+        let path_str = display_path(&d.path);
         println!(
             "  {:10} {:<width$}  {}",
             type_label(d.artifact_type),
